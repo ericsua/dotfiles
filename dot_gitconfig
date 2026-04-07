@@ -1,0 +1,18 @@
+[core]
+	excludesfile = /Users/ericsuardi/.gitignore_global
+[difftool "sourcetree"]
+	cmd = /usr/local/bin/code --diff --wait \"$LOCAL\" \"$REMOTE\"
+	path = 
+[mergetool "sourcetree"]
+	cmd = /usr/local/bin/code --merge --wait \"$LOCAL\" \"$REMOTE\" \"$MERGED\"
+	trustExitCode = true
+[user]
+	name = Eric Suardi
+	email = eric.suardi@afliant.com
+[commit]
+	template = /Users/ericsuardi/.stCommitMsg
+[filter "lfs"]
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
