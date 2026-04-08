@@ -1,3 +1,87 @@
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+# If on macOS and brew is installed, add brew to the path and load brew shellenv
+# eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# Set the directory we want to store zinit and plugins
+ZINIT_HOME="${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git"
+
+# Donwload zinit if it's not there yet
+if [[ ! -d $ZINIT_HOME ]]; then
+  mkdir -p "$(dirname "$ZINIT_HOME")"
+  git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+fi
+
+# Source/Load zinit
+source "$ZINIT_HOME/zinit.zsh"
+
+# Add in Powerlevel10k
+# ice is a zinit command that adds options to the next zinit command.
+# Here we set depth=1 to only clone the latest commit of the powerlevel10k repository,
+# which makes the installation faster and uses less disk space.
+# Zinit has two main commands to load plugins: light and load.
+# load has also reporting and investigating features, but light is faster and sufficient for most plugins.
+zinit ice depth=1; zinit light romkatv/powerlevel10k
+
+# Add in zsh plugins (the big three)
+zinit light zsh-users/zsh-syntax-highlighting
+zinit light zsh-users/zsh-autosuggestions
+zinit light zsh-users/zsh-completions
+zinit light Aloxaf/fzf-tab
+
+# Add in snippets (OMZP is a namespace for Oh My Zsh plugins)
+# Snippets (as in Oh My Zsh plugins) allow to download and install plugins via URL (or namespaces)
+# A nice place to find snippets is the Oh My Zsh github repository under the plugins folder:
+# https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins
+zinit snippet OMZP::git
+zinit snippet OMZP::sudo
+zinit snippet OMZP::archlinux
+zinit snippet OMZP::aws
+zinit snippet OMZP::kubectl
+zinit snippet OMZP::kubectx
+zinit snippet OMZP::command-not-found
+
+# Load completions
+autoload -U compinit && compinit
+
+zinit cdreplay -q
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# History configuration
+HISTSIZE=10000
+HISTFILE=~/.zsh_history
+SAVEHIST=$HISTSIZE
+HISTDUP=erase # Remove duplicates from history
+setopt append_history # Append to history file, don't overwrite it
+setopt share_history # Share history across all sessions
+setopt hist_ignore_space # Ignore commands that start with a space in history
+setopt hist_ignore_all_dups # Remove all duplicates from history
+setopt hist_save_no_dups # Don't save duplicates in history file
+setopt hist_ignore_dups # Don't record an entry that was just recorded again
+setopt hist_find_no_dups # Don't display duplicates in history search
+
+# Completion styling
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}' # Case-insensitive completion
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}" # Use LS_COLORS for completion colors
+zstyle ':completion:*' menu no # Show all matches, don't use a menu
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls -G $realpath' # Show directory contents in fzf preview when completing cd
+zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls -G $realpath' # Show directory contents in fzf preview when completing zoxide
+
+# Aliases
+alias ls='ls -G' # Enable colorized output for ls on macOS (-G is the option for colorized output on macOS, otherwise use --color)
+alias c='clear' # Clear the terminal with 'c'
+
+# Shell integrations
+# Make sure fzf is installed (brew install fzf)
+eval "$(fzf --zsh)"
+
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
 
@@ -71,7 +155,7 @@ ZSH_THEME="robbyrussell"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 
-plugins=(git docker zsh-pre-commit-autocomplete fzf-tab rust ollama chezmoi)
+plugins=(git docker zsh-pre-commit-autocomplete rust ollama chezmoi)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -195,32 +279,32 @@ fi
 export LDFLAGS="-L/opt/homebrew/opt/libomp/lib"
 export CPPFLAGS="-I/opt/homebrew/opt/libomp/include"
 
-export GOOGLE_CLOUD_PROJECT="gen-lang-client-***"
+export GOOGLE_CLOUD_PROJECT="{{ .gen_project_id }}"
 # The following lines have been added by Docker Desktop to enable Docker CLI completions.
 fpath=(/Users/ericsuardi/.docker/completions $fpath)
 autoload -Uz compinit
 compinit
 # End of Docker CLI completions
 
-export NUV_INDEX="https://__token__:glpat-***@lab.u-hopper.com/api/v4/projects/3/packages/pypi/simple
-https://__token__:glpat-***@lab.u-hopper.com/api/v4/projects/4/packages/pypi/simple
-https://__token__:glpat-***@lab.u-hopper.com/api/v4/projects/28/packages/pypi/simple
-https://__token__:glpat-***@lab.u-hopper.com/api/v4/projects/84/packages/pypi/simple
-https://__token__:glpat-***@lab.u-hopper.com/api/v4/projects/105/packages/pypi/simple
-https://__token__:glpat-***@lab.u-hopper.com/api/v4/projects/130/packages/pypi/simple
-https://__token__:glpat-***@lab.u-hopper.com/api/v4/projects/143/packages/pypi/simple
-https://__token__:glpat-***@lab.u-hopper.com/api/v4/projects/260/packages/pypi/simple
-https://__token__:glpat-***@lab.u-hopper.com/api/v4/projects/273/packages/pypi/simple
-https://__token__:glpat-***@lab.u-hopper.com/api/v4/projects/286/packages/pypi/simple
-https://__token__:glpat-***@lab.u-hopper.com/api/v4/projects/295/packages/pypi/simple
-https://__token__:glpat-***@lab.u-hopper.com/api/v4/projects/314/packages/pypi/simple
-https://__token__:glpat-***@lab.u-hopper.com/api/v4/projects/323/packages/pypi/simple
-https://__token__:glpat-***@lab.u-hopper.com/api/v4/projects/332/packages/pypi/simple
-https://__token__:glpat-***@lab.u-hopper.com/api/v4/projects/339/packages/pypi/simple
-https://__token__:glpat-***@lab.u-hopper.com/api/v4/projects/361/packages/pypi/simple
-https://__token__:glpat-***@lab.u-hopper.com/api/v4/projects/374/packages/pypi/simple"
+export NUV_INDEX="https://__token__:{{ .gitlab_token }}@lab.u-hopper.com/api/v4/projects/3/packages/pypi/simple
+https://__token__:{{ .gitlab_token }}@lab.u-hopper.com/api/v4/projects/4/packages/pypi/simple
+https://__token__:{{ .gitlab_token }}@lab.u-hopper.com/api/v4/projects/28/packages/pypi/simple
+https://__token__:{{ .gitlab_token }}@lab.u-hopper.com/api/v4/projects/84/packages/pypi/simple
+https://__token__:{{ .gitlab_token }}@lab.u-hopper.com/api/v4/projects/105/packages/pypi/simple
+https://__token__:{{ .gitlab_token }}@lab.u-hopper.com/api/v4/projects/130/packages/pypi/simple
+https://__token__:{{ .gitlab_token }}@lab.u-hopper.com/api/v4/projects/143/packages/pypi/simple
+https://__token__:{{ .gitlab_token }}@lab.u-hopper.com/api/v4/projects/260/packages/pypi/simple
+https://__token__:{{ .gitlab_token }}@lab.u-hopper.com/api/v4/projects/273/packages/pypi/simple
+https://__token__:{{ .gitlab_token }}@lab.u-hopper.com/api/v4/projects/286/packages/pypi/simple
+https://__token__:{{ .gitlab_token }}@lab.u-hopper.com/api/v4/projects/295/packages/pypi/simple
+https://__token__:{{ .gitlab_token }}@lab.u-hopper.com/api/v4/projects/314/packages/pypi/simple
+https://__token__:{{ .gitlab_token }}@lab.u-hopper.com/api/v4/projects/323/packages/pypi/simple
+https://__token__:{{ .gitlab_token }}@lab.u-hopper.com/api/v4/projects/332/packages/pypi/simple
+https://__token__:{{ .gitlab_token }}@lab.u-hopper.com/api/v4/projects/339/packages/pypi/simple
+https://__token__:{{ .gitlab_token }}@lab.u-hopper.com/api/v4/projects/361/packages/pypi/simple
+https://__token__:{{ .gitlab_token_2 }}@lab.u-hopper.com/api/v4/projects/374/packages/pypi/simple"
 # My personal project library for testing packages:
-# https://__token__:glpat-***@lab.u-hopper.com/api/v4/projects/390/packages/pypi/simple"
+# https://__token__:{{ .gitlab_token_2 }}@lab.u-hopper.com/api/v4/projects/390/packages/pypi/simple"
 
 # Added by Antigravity
 export PATH="/Users/ericsuardi/.antigravity/antigravity/bin:$PATH"
@@ -231,3 +315,5 @@ if [ -f '/Users/ericsuardi/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/
 
 # The next line enables shell command completion for gcloud.
 if [ -f '/Users/ericsuardi/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/ericsuardi/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
+
+export CLAUDE_CODE_NO_FLICKER=1
