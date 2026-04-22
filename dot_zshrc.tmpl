@@ -63,6 +63,11 @@ zinit snippet OMZP::command-not-found
 zinit snippet OMZP::docker
 zinit snippet OMZP::rust
 zinit snippet OMZP::chezmoi
+zinit snippet OMZP::alias-finder  # Automatically finds and suggests aliases if you type a command that has a defined alias (e.g., typing `git status` would suggest `gst` if you have that alias defined)
+zinit snippet OMZP::colored-man-pages  # Adds color to man pages for better readability
+zinit snippet OMZP::common-aliases  # Provides a collection of common aliases for various commands (e.g., `ls`, `grep`, `docker`, etc.)
+zinit snippet OMZP::dotenv  # Exports variables from .env files when you `cd` into a directory containing one
+zinit snippet OMZP::gitignore  # Provides `gi` command to create .gitignore files from gitignore.io templates
 
 # (NOT NEEDED) Docker CLI completions (eval-based; the fpath file from Docker Desktop
 # contains a bare `compdef` that breaks autoload).
@@ -124,8 +129,12 @@ zstyle ':completion:*' group-name ''  # ZSH-AUTOCOMPLETE: avoid "do you wish to 
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls -G $realpath'  # Show directory contents in fzf preview when completing cd
 zstyle ':fzf-tab:complete:ls:*' fzf-preview 'ls -G $realpath'  # Show directory contents in fzf preview when completing ls
 zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls -G $realpath'  # Show directory contents in fzf preview when completing zoxide
-zstyle ':completion:*:*:docker:*' option-stacking yes
-zstyle ':completion:*:*:docker-*:*' option-stacking yes
+zstyle ':completion:*:*:docker:*' option-stacking yes  # Allow stacking multiple options when completing docker commands (e.g., `docker run --[TAB]` shows all options, and you can select multiple to stack them together)
+zstyle ':completion:*:*:docker-*:*' option-stacking yes  # Same for docker subcommands (e.g., `docker run --[TAB]`)
+zstyle ':omz:plugins:alias-finder' autoload yes  # disabled by default
+zstyle ':omz:plugins:alias-finder' longer yes  # disabled by default
+zstyle ':omz:plugins:alias-finder' exact yes  # disabled by default
+zstyle ':omz:plugins:alias-finder' cheaper yes  # disabled by default
 
 # ==============================================================================
 # Key Bindings
