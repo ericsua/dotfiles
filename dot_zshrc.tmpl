@@ -6,7 +6,10 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
 fi
 
 # If on macOS and brew is installed, add brew to the path and load brew shellenv
-# eval "$(/opt/homebrew/bin/brew shellenv)"
+if [[ -f "/opt/homebrew/bin/brew" ]]; then
+  # If you're using macOS, you'll want this enabled
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
 
 # ==============================================================================
 # Zinit Plugin Manager
@@ -36,15 +39,14 @@ source "$ZINIT_HOME/zinit.zsh"
 # load has also reporting and investigating features, but light is faster and sufficient for most plugins.
 zinit ice depth=1; zinit light romkatv/powerlevel10k
 
-# Make compinit available before plugins that need it (e.g. zsh-autocomplete)
-autoload -Uz compinit
-
-# Core zsh plugins
+# Completion-source plugins (compdefs are queued by zinit and replayed via
+# `zinit cdreplay` after compinit)
+zinit light zsh-users/zsh-syntax-highlighting
 zinit light zsh-users/zsh-completions
 zinit light zsh-users/zsh-autosuggestions
-zinit light zsh-users/zsh-syntax-highlighting
-zinit light Aloxaf/fzf-tab
 zinit light marlonrichert/zsh-autocomplete
+zinit light Aloxaf/fzf-tab
+zinit light jason810496/zsh-pre-commit-autocomplete
 
 # Oh My Zsh plugin snippets (loaded individually via zinit)
 # Add in snippets (OMZP is a namespace for Oh My Zsh plugins)
@@ -61,21 +63,33 @@ zinit snippet OMZP::command-not-found
 zinit snippet OMZP::docker
 zinit snippet OMZP::rust
 zinit snippet OMZP::chezmoi
-zinit light ocodo/ollama_zsh_completion
-zinit light jason810496/zsh-pre-commit-autocomplete
 
-# NOTE: 'ollama' and 'zsh-pre-commit-autocomplete' were previously loaded via
-# the full Oh My Zsh framework. If you need them, install them as zinit plugins:
+# (NOT NEEDED) Docker CLI completions (eval-based; the fpath file from Docker Desktop
+# contains a bare `compdef` that breaks autoload).
+# Must come AFTER compinit, otherwise `compdef` (autoloaded by compinit) is
+# undefined when the eval'd script tries to register `_docker`.
+# if command -v docker &>/dev/null; then
+#   eval "$(docker completion zsh)"
+# fi
+
 
 # ==============================================================================
 # Completions
 # ==============================================================================
 
-# Docker CLI completions
-fpath=($HOME/.docker/completions $fpath)
+# Make compinit available; we'll call it explicitly below.
+autoload -Uz compinit && compinit
 
-compinit
+# Ollama completions, must come after compinit since it calls compinit itself instead of compdef
+zinit light ocodo/ollama_zsh_completion
+
+# Replay the `compdef` calls that plugins/snippets above queued before
+# `compinit` was ready. zinit captures every `compdef` issued before compinit
+# exists and stashes them in a queue; `cdreplay` flushes that queue once the
+# completion system is initialised, so those plugins actually register their
+# completion functions. The `-q` flag silences "compdef was queued" notices.
 zinit cdreplay -q
+
 
 # ==============================================================================
 # Powerlevel10k
@@ -108,12 +122,16 @@ zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"  # Use LS_COLORS for com
 zstyle ':completion:*' menu no  # Show all matches, don't use a menu
 zstyle ':completion:*' group-name ''  # ZSH-AUTOCOMPLETE: avoid "do you wish to see all XXX possibilities"
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls -G $realpath'  # Show directory contents in fzf preview when completing cd
+zstyle ':fzf-tab:complete:ls:*' fzf-preview 'ls -G $realpath'  # Show directory contents in fzf preview when completing ls
 zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls -G $realpath'  # Show directory contents in fzf preview when completing zoxide
+zstyle ':completion:*:*:docker:*' option-stacking yes
+zstyle ':completion:*:*:docker-*:*' option-stacking yes
 
 # ==============================================================================
-# Key Bindings (restore defaults overridden by zsh-autocomplete)
+# Key Bindings
 # ==============================================================================
-# ZSH-AUTOCOMPLETE: Restore default ZSH behavior of up and down keys (down not restored to enter menus – now yes)
+# Restore default zsh behavior of up/down keys (zsh-autocomplete remaps them to
+# completion-menu navigation by default; we want history navigation here).
 bindkey '\e[A' up-line-or-history
 bindkey '\eOA' up-line-or-history
 bindkey '\e[B' down-line-or-history
@@ -122,6 +140,10 @@ bindkey '\eOB' down-line-or-history
 # ZSH-AUTOCOMPLETE: Make tab enter menu instead of filling with first completion
 bindkey              '^I' menu-select
 bindkey "$terminfo[kcbt]" menu-select
+
+# Magic Space to expand aliases and commands (e.g. `gco` expands to `git checkout` before executing)
+bindkey ' ' magic-space
+
 
 # ==============================================================================
 # Aliases
