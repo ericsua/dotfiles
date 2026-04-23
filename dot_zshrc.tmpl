@@ -66,7 +66,7 @@ zinit snippet OMZP::chezmoi
 zinit snippet OMZP::alias-finder  # Automatically finds and suggests aliases if you type a command that has a defined alias (e.g., typing `git status` would suggest `gst` if you have that alias defined)
 zinit snippet OMZP::colored-man-pages  # Adds color to man pages for better readability
 zinit snippet OMZP::common-aliases  # Provides a collection of common aliases for various commands (e.g., `ls`, `grep`, `docker`, etc.)
-zinit snippet OMZP::dotenv  # Exports variables from .env files when you `cd` into a directory containing one
+# zinit snippet OMZP::dotenv  # Exports variables from .env files when you `cd` into a directory containing one
 zinit snippet OMZP::gitignore  # Provides `gi` command to create .gitignore files from gitignore.io templates
 
 # (NOT NEEDED) Docker CLI completions (eval-based; the fpath file from Docker Desktop
@@ -160,6 +160,9 @@ bindkey ' ' magic-space
 
 alias ls='ls -G'
 alias c='clear'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
 
 # PyEnv
 # PyEnv recommendation to avoid accidentally linking against a Pyenv-provided Python
