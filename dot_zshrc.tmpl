@@ -141,9 +141,13 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'  # Case-insensitive completi
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"  # Use LS_COLORS for completion colors
 zstyle ':completion:*' menu no  # Show all matches, don't use a menu
 zstyle ':completion:*' group-name ''  # ZSH-AUTOCOMPLETE: avoid "do you wish to see all XXX possibilities"
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls -G $realpath'  # Show directory contents in fzf preview when completing cd
-zstyle ':fzf-tab:complete:ls:*' fzf-preview 'ls -G $realpath'  # Show directory contents in fzf preview when completing ls
-zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls -G $realpath'  # Show directory contents in fzf preview when completing zoxide
+# fzf-tab previews: prefer eza (reads LS_COLORS, supports icons + git status),
+# fall back to BSD `ls -G` on machines where eza isn't installed.
+_fzf_preview_dir='eza --color=always --icons --group-directories-first $realpath 2>/dev/null || ls -G $realpath'
+zstyle ':fzf-tab:complete:cd:*'           fzf-preview "$_fzf_preview_dir"
+zstyle ':fzf-tab:complete:ls:*'           fzf-preview "$_fzf_preview_dir"
+zstyle ':fzf-tab:complete:__zoxide_z:*'   fzf-preview "$_fzf_preview_dir"
+unset _fzf_preview_dir
 zstyle ':completion:*:*:docker:*' option-stacking yes  # Allow stacking multiple options when completing docker commands (e.g., `docker run --[TAB]` shows all options, and you can select multiple to stack them together)
 zstyle ':completion:*:*:docker-*:*' option-stacking yes  # Same for docker subcommands (e.g., `docker run --[TAB]`)
 zstyle ':omz:plugins:alias-finder' autoload yes  # automatically run alias-finder on every command (disabled by default)
@@ -173,7 +177,20 @@ bindkey ' ' magic-space
 # Aliases
 # ==============================================================================
 
-alias ls='ls -G'
+# eza (modern Rust ls replacement): reads LS_COLORS so vivid theme applies,
+# git-aware (--git), supports icons, sensible defaults. Falls back to BSD ls
+# with -G (colors) on machines where eza isn't installed.
+# Note: these override the `ll`/`la`/`l` aliases from OMZP::common-aliases.
+if command -v eza >/dev/null 2>&1; then
+  alias ls='eza --color=auto --group-directories-first'
+  alias ll='eza -l --color=auto --group-directories-first --git'
+  alias la='eza -la --color=auto --group-directories-first --git'
+  alias l='eza -la --color=auto --group-directories-first --git'
+  alias lt='eza --tree --color=auto --level=2 --group-directories-first'
+  alias ltt='eza --tree --color=auto --level=3 --group-directories-first'
+else
+  alias ls='ls -G'
+fi
 alias c='clear'
 alias ..='cd ..'
 alias ...='cd ../..'

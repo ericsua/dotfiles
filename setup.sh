@@ -54,7 +54,7 @@ install_dependencies() {
   info "Installing dependencies..."
 
   if [[ "$OS" == "macos" ]]; then
-    brew install chezmoi git zsh fzf zoxide pyenv uv
+    brew install chezmoi git zsh fzf zoxide pyenv uv vivid eza coreutils
     # Optional but recommended
     brew install llvm libomp ngrok go
   elif [[ "$OS" == "linux" ]]; then

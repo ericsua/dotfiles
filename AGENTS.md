@@ -5,6 +5,7 @@ Personal dotfiles managed with [chezmoi](https://www.chezmoi.io/), targeting mac
 ## Repository Structure
 
 ```
+dot_zshenv         # Zsh env (XDG vars, PATH, cargo) — sourced for ALL zsh invocations
 dot_zshrc.tmpl    # Zsh config (chezmoi template — uses variables from chezmoi.toml)
 dot_p10k.zsh      # Powerlevel10k prompt theme config
 dot_gitconfig      # Git config (VS Code merge/diff, LFS, commit template)
@@ -12,6 +13,10 @@ dot_bashrc         # Minimal bash config (LM Studio, Cargo)
 setup.sh           # Bootstrap script for fresh machines (macOS + Linux)
 README.md          # User-facing setup instructions
 ```
+
+### .zshenv vs .zshrc
+
+Environment variables (XDG paths, PATH, language env init like `cargo env`) live in `dot_zshenv` so they're set for non-interactive zsh too (scripts, `ssh host 'cmd'`, GUI-launched processes). Interactive-only config (plugins, prompt, key bindings, aliases, completions) stays in `dot_zshrc.tmpl`.
 
 ## Architecture Decisions
 
