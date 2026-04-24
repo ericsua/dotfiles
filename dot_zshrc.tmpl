@@ -39,14 +39,29 @@ source "$ZINIT_HOME/zinit.zsh"
 # load has also reporting and investigating features, but light is faster and sufficient for most plugins.
 zinit ice depth=1; zinit light romkatv/powerlevel10k
 
+# Raise FD limit so heavy completion (zsh-autocomplete + fzf-tab +
+# autosuggestions + syntax-highlighting) doesn't exhaust file descriptors and
+# trip "_zsh_highlight: cannot duplicate fd 1: too many open files".
+ulimit -n 65536 2>/dev/null || ulimit -n 4096
+
 # Completion-source plugins (compdefs are queued by zinit and replayed via
 # `zinit cdreplay` after compinit)
-zinit light zsh-users/zsh-syntax-highlighting
+# zinit light zsh-users/zsh-syntax-highlighting
 zinit light zsh-users/zsh-completions
+
 zinit light zsh-users/zsh-autosuggestions
-zinit light marlonrichert/zsh-autocomplete
 zinit light Aloxaf/fzf-tab
 zinit light jason810496/zsh-pre-commit-autocomplete
+# Faster, more FD-friendly syntax highlighter than zsh-users/zsh-syntax-highlighting.
+# Loaded after autosuggestions/fzf-tab so it wraps their widgets, but BEFORE
+# zsh-autocomplete (see comment on the autocomplete line below for why).
+zinit light zdharma-continuum/fast-syntax-highlighting
+# zsh-autocomplete must be loaded LAST, AFTER both zsh-autosuggestions and
+# fast-syntax-highlighting. This is the only order that avoids the
+# "unhandled ZLE widget 'menu-search' / 'recent-paths'" warnings emitted by
+# fast-syntax-highlighting at startup (per @hmijail's comment in
+# https://github.com/marlonrichert/zsh-autocomplete/issues/711).
+zinit light marlonrichert/zsh-autocomplete
 
 # Oh My Zsh plugin snippets (loaded individually via zinit)
 # Add in snippets (OMZP is a namespace for Oh My Zsh plugins)
@@ -131,10 +146,10 @@ zstyle ':fzf-tab:complete:ls:*' fzf-preview 'ls -G $realpath'  # Show directory 
 zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls -G $realpath'  # Show directory contents in fzf preview when completing zoxide
 zstyle ':completion:*:*:docker:*' option-stacking yes  # Allow stacking multiple options when completing docker commands (e.g., `docker run --[TAB]` shows all options, and you can select multiple to stack them together)
 zstyle ':completion:*:*:docker-*:*' option-stacking yes  # Same for docker subcommands (e.g., `docker run --[TAB]`)
-zstyle ':omz:plugins:alias-finder' autoload yes  # disabled by default
-zstyle ':omz:plugins:alias-finder' longer yes  # disabled by default
-zstyle ':omz:plugins:alias-finder' exact yes  # disabled by default
-zstyle ':omz:plugins:alias-finder' cheaper yes  # disabled by default
+zstyle ':omz:plugins:alias-finder' autoload yes  # automatically run alias-finder on every command (disabled by default)
+# zstyle ':omz:plugins:alias-finder' longer yes  # disabled by default
+# zstyle ':omz:plugins:alias-finder' exact yes  # disabled by default
+# zstyle ':omz:plugins:alias-finder' cheaper yes  # disabled by default
 
 # ==============================================================================
 # Key Bindings
