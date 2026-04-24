@@ -1,0 +1,50 @@
+# ==============================================================================
+# ~/.zaliases — shell aliases (sourced from .zshrc)
+#
+# Kept separate from .zshrc so:
+#   - It's easy to find/edit aliases in one place
+#   - Other shells (.bashrc) can source it too if desired
+#   - Tab-completion of `which <alias>` reveals the source file directly
+# ==============================================================================
+
+# ==============================================================================
+# ls — eza (modern Rust ls replacement)
+# ==============================================================================
+# eza reads LS_COLORS so the vivid theme set in .zshenv applies. It's also
+# git-aware (--git) and supports icons (needs a Nerd Font, which p10k pulls in).
+# Falls back to BSD `ls -G` on machines where eza isn't installed.
+# Note: these override the `ll`/`la`/`l` aliases from OMZP::common-aliases.
+if command -v eza >/dev/null 2>&1; then
+  alias ls='eza --color=auto --group-directories-first'
+  alias ll='eza -l  --color=auto --group-directories-first --git'
+  alias la='eza -la --color=auto --group-directories-first --git'
+  alias l='eza  -la --color=auto --group-directories-first --git'
+  alias lt='eza  --tree --color=auto --level=2 --group-directories-first'
+  alias ltt='eza --tree --color=auto --level=3 --group-directories-first'
+else
+  alias ls='ls -G'
+fi
+
+# ==============================================================================
+# Navigation / misc
+# ==============================================================================
+alias c='clear'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+
+# ==============================================================================
+# pyenv ↔ brew interop
+# ==============================================================================
+# Strip pyenv shims from PATH when invoking brew so brew doesn't accidentally
+# link against a pyenv-managed Python (per pyenv's own recommendation).
+alias brew='env PATH="${PATH//$(pyenv root)\/shims:/}" brew'
+
+# ==============================================================================
+# tmux convenience
+# ==============================================================================
+alias tm='tmux'
+alias tma='tmux attach -t'
+alias tmls='tmux list-sessions'
+alias tmn='tmux new-session -s'
+alias tmk='tmux kill-session -t'

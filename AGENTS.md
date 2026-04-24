@@ -5,18 +5,30 @@ Personal dotfiles managed with [chezmoi](https://www.chezmoi.io/), targeting mac
 ## Repository Structure
 
 ```
-dot_zshenv         # Zsh env (XDG vars, PATH, cargo) — sourced for ALL zsh invocations
-dot_zshrc.tmpl    # Zsh config (chezmoi template — uses variables from chezmoi.toml)
-dot_p10k.zsh      # Powerlevel10k prompt theme config
-dot_gitconfig      # Git config (VS Code merge/diff, LFS, commit template)
-dot_bashrc         # Minimal bash config (LM Studio, Cargo)
-setup.sh           # Bootstrap script for fresh machines (macOS + Linux)
-README.md          # User-facing setup instructions
+dot_zshenv                       # Zsh env (XDG vars, PATH, cargo, ls colors) — sourced for ALL zsh invocations
+dot_zshrc.tmpl                   # Zsh config (chezmoi template — uses variables from chezmoi.toml)
+dot_zaliases                     # Shell aliases (sourced from .zshrc)
+dot_p10k.zsh                     # Powerlevel10k prompt theme config
+dot_gitconfig                    # Git config (VS Code merge/diff, LFS, commit template)
+dot_bashrc                       # Minimal bash config (LM Studio, Cargo)
+dot_config/ghostty/config        # Ghostty terminal config (XDG location)
+dot_config/tmux/tmux.conf        # tmux config + TPM bootstrap (XDG location)
+setup.sh                         # Bootstrap script for fresh machines (macOS + Linux)
+README.md                        # User-facing setup instructions
 ```
 
-### .zshenv vs .zshrc
+### .zshenv vs .zshrc vs .zaliases
 
-Environment variables (XDG paths, PATH, language env init like `cargo env`) live in `dot_zshenv` so they're set for non-interactive zsh too (scripts, `ssh host 'cmd'`, GUI-launched processes). Interactive-only config (plugins, prompt, key bindings, aliases, completions) stays in `dot_zshrc.tmpl`.
+- **`dot_zshenv`** — environment variables (XDG paths, PATH, language env init like `cargo env`, `LS_COLORS`/`LSCOLORS`/`CLICOLOR`). Sourced for every zsh invocation including non-interactive contexts (scripts, `ssh host 'cmd'`, GUI-launched processes).
+- **`dot_zshrc.tmpl`** — interactive-only config: plugins, prompt, key bindings, completions, shell integrations.
+- **`dot_zaliases`** — shell aliases only; sourced from `.zshrc`. Kept separate so `which <alias>` points to a single canonical file and so other shells (e.g. `.bashrc`) can source it.
+
+### XDG-managed app configs
+
+Tools whose configs live under `~/.config/` (the XDG default) go in `dot_config/<app>/...` in the chezmoi repo:
+
+- **Ghostty** (>= 1.0) — `dot_config/ghostty/config`. Ghostty checks `$XDG_CONFIG_HOME/ghostty/config` first on macOS, before the legacy `~/Library/Application Support/com.mitchellh.ghostty/config`.
+- **tmux** (>= 3.1) — `dot_config/tmux/tmux.conf`. Auto-discovered; no need to symlink to `~/.tmux.conf`. TPM is auto-bootstrapped on first tmux start (and also installed by `setup.sh`).
 
 ## Architecture Decisions
 

@@ -174,31 +174,10 @@ bindkey ' ' magic-space
 
 
 # ==============================================================================
-# Aliases
+# Aliases (defined in ~/.zaliases — kept separate so the file can be sourced
+# from other shells too and so `which <alias>` points to a single source).
 # ==============================================================================
-
-# eza (modern Rust ls replacement): reads LS_COLORS so vivid theme applies,
-# git-aware (--git), supports icons, sensible defaults. Falls back to BSD ls
-# with -G (colors) on machines where eza isn't installed.
-# Note: these override the `ll`/`la`/`l` aliases from OMZP::common-aliases.
-if command -v eza >/dev/null 2>&1; then
-  alias ls='eza --color=auto --group-directories-first'
-  alias ll='eza -l --color=auto --group-directories-first --git'
-  alias la='eza -la --color=auto --group-directories-first --git'
-  alias l='eza -la --color=auto --group-directories-first --git'
-  alias lt='eza --tree --color=auto --level=2 --group-directories-first'
-  alias ltt='eza --tree --color=auto --level=3 --group-directories-first'
-else
-  alias ls='ls -G'
-fi
-alias c='clear'
-alias ..='cd ..'
-alias ...='cd ../..'
-alias ....='cd ../../..'
-
-# PyEnv
-# PyEnv recommendation to avoid accidentally linking against a Pyenv-provided Python
-alias brew='env PATH="${PATH//$(pyenv root)\/shims:/}" brew'
+[[ -f "$HOME/.zaliases" ]] && source "$HOME/.zaliases"
 
 # ==============================================================================
 # PATH

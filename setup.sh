@@ -54,7 +54,11 @@ install_dependencies() {
   info "Installing dependencies..."
 
   if [[ "$OS" == "macos" ]]; then
-    brew install chezmoi git zsh fzf zoxide pyenv uv vivid eza coreutils
+    # Core: shell + dotfile mgr + nav + dev tools + tmux stack
+    # Note: tpm is installed via brew (referenced in dot_config/tmux/tmux.conf
+    # at $HOMEBREW_PREFIX/opt/tpm/share/tpm/tpm). On Linux it's bootstrapped
+    # via git clone (see install_tpm() below).
+    brew install chezmoi git zsh fzf zoxide pyenv uv vivid eza coreutils tmux tpm fastfetch
     # Optional but recommended
     brew install llvm libomp ngrok go
   elif [[ "$OS" == "linux" ]]; then
@@ -65,7 +69,7 @@ install_dependencies() {
     # Install other tools (adjust for your package manager)
     if command -v apt-get &>/dev/null; then
       sudo apt-get update
-      sudo apt-get install -y git zsh fzf
+      sudo apt-get install -y git zsh fzf tmux fastfetch
       # zoxide
       if ! command -v zoxide &>/dev/null; then
         curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
@@ -79,11 +83,37 @@ install_dependencies() {
         curl -LsSf https://astral.sh/uv/install.sh | sh
       fi
     elif command -v pacman &>/dev/null; then
-      sudo pacman -Syu --noconfirm git zsh fzf zoxide pyenv
+      sudo pacman -Syu --noconfirm git zsh fzf zoxide pyenv tmux fastfetch
     else
-      warn "Unknown package manager. Install manually: git, zsh, fzf, zoxide, pyenv, uv"
+      warn "Unknown package manager. Install manually: git, zsh, fzf, zoxide, pyenv, uv, tmux, fastfetch"
     fi
   fi
+}
+
+# --- Install TPM (Tmux Plugin Manager) ---
+# On macOS this is a no-op (tpm is installed via brew above and referenced
+# in tmux.conf at $HOMEBREW_PREFIX/opt/tpm/share/tpm/tpm). On Linux we git
+# clone TPM into ~/.tmux/plugins/tpm — that's also TPM's default plugin
+# install location, which our tmux.conf falls back to when the brew path
+# doesn't exist.
+install_tpm() {
+  if [[ "$OS" == "macos" ]]; then
+    if [[ -e "${HOMEBREW_PREFIX:-/opt/homebrew}/opt/tpm/share/tpm/tpm" ]]; then
+      info "TPM already installed via brew"
+      return
+    fi
+    warn "Expected brew tpm at \${HOMEBREW_PREFIX}/opt/tpm — install with: brew install tpm"
+    return
+  fi
+  local tpm_dir="$HOME/.tmux/plugins/tpm"
+  if [[ -d "$tpm_dir/.git" ]]; then
+    info "TPM already cloned at $tpm_dir"
+    return
+  fi
+  info "Cloning TPM (Tmux Plugin Manager) to $tpm_dir..."
+  mkdir -p "$(dirname "$tpm_dir")"
+  git clone --depth 1 https://github.com/tmux-plugins/tpm "$tpm_dir"
+  info "TPM installed. Inside tmux, press 'prefix + I' to install configured plugins."
 }
 
 # --- Configure chezmoi template variables ---
@@ -151,6 +181,7 @@ main() {
   configure_chezmoi
   set_default_shell
   apply_dotfiles
+  install_tpm
 
   echo ""
   info "Done! Restart your terminal or run: exec zsh"
