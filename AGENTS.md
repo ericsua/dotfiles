@@ -11,7 +11,7 @@ dot_zaliases                     # Shell aliases (sourced from .zshrc)
 dot_p10k.zsh                     # Powerlevel10k prompt theme config
 dot_gitconfig                    # Git config (VS Code merge/diff, LFS, commit template)
 dot_bashrc                       # Minimal bash config (LM Studio, Cargo)
-dot_config/ghostty/config        # Ghostty terminal config (XDG location)
+dot_config/ghostty/config.ghostty # Ghostty terminal config (XDG location, .ghostty extension since v1.3.0)
 dot_config/tmux/tmux.conf        # tmux config + TPM bootstrap (XDG location)
 setup.sh                         # Bootstrap script for fresh machines (macOS + Linux)
 README.md                        # User-facing setup instructions
@@ -27,7 +27,7 @@ README.md                        # User-facing setup instructions
 
 Tools whose configs live under `~/.config/` (the XDG default) go in `dot_config/<app>/...` in the chezmoi repo:
 
-- **Ghostty** (>= 1.0) — `dot_config/ghostty/config`. Ghostty checks `$XDG_CONFIG_HOME/ghostty/config` first on macOS, before the legacy `~/Library/Application Support/com.mitchellh.ghostty/config`.
+- **Ghostty** (>= 1.3.0) — `dot_config/ghostty/config.ghostty`. The `.ghostty` extension became the canonical name in v1.3.0 (PR ghostty-org/ghostty#8885); both names still work, but `config.ghostty` takes priority when both exist (and unlocks editor syntax highlighting via the Ghostty VS Code/Zed extensions). Ghostty checks `$XDG_CONFIG_HOME/ghostty/` first on macOS, before the legacy `~/Library/Application Support/com.mitchellh.ghostty/`.
 - **tmux** (>= 3.1) — `dot_config/tmux/tmux.conf`. Auto-discovered; no need to symlink to `~/.tmux.conf`. TPM is auto-bootstrapped on first tmux start (and also installed by `setup.sh`).
 
 ## Architecture Decisions
